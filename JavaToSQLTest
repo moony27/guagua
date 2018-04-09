@@ -1,0 +1,61 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+ 
+/**
+ * java读取数据库内容并存放到文件中
+ * @author young
+ *
+ */
+public class JavaToSQLTest {
+    public static void main(String[] args) throws FileNotFoundException {
+        File file = new File("F:\\workspace\\test.txt");
+        PrintWriter pw = new PrintWriter(file);
+        String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+        String url = "jdbc:sqlserver://localhost:1433;DatabaseName = soft";
+        Connection conn = null;
+        String id;
+        String fname, lname;
+        try {
+            pw.println("emp_id\t\tfname\t\tlname");
+            Class.forName(driver);
+            conn = DriverManager.getConnection(url, "sa", "1234");
+            PreparedStatement ps = conn.prepareStatement("select emp_id, fname, lname from emps");
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                id = rs.getString("emp_id");
+                fname = rs.getString("fname");
+                lname = rs.getString("lname");
+                pw.print(id + "\t");
+                pw.print(fname + "\t\t");
+                pw.print(lname);
+                pw.println();
+            }
+             
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }finally{
+            if(conn != null){
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            if(pw != null){
+                pw.close();
+            }
+        }
+         
+    }
+}
